@@ -7,3 +7,4 @@ chromedriver_installer.egg-info/
 *.pyc
 MANIFEST
 .cache/
+venv/

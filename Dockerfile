@@ -1,8 +1,8 @@
 FROM library/python
 
-WORKDIR /home/chromedriver_installer
+WORKDIR /home/geckodriver_installer
 
-ADD . /home/chromedriver_installer
+ADD . /home/geckodriver_installer
 
 # Chromedriver 2.29 complains on Ubuntu about
 # missing libnss3 and libgconf-2-4 libraries.

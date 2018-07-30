@@ -21,8 +21,8 @@ INSTALL_COMMAND_BASE = 'pip install {0} '.format(PROJECT_DIR)
 
 def generate_version_fixture_params():
     """
-    Loads all known versions of chromedriver from
-    `https://chromedriver.storage.googleapis.com`__
+    Loads all known versions of geckodriver from
+    `https://github.com/mozilla/geckodriver/releases`__
     and returns a dictionary with keys ``params`` and ``ids`` which should be
     unpacked as arguments to :func:`pytest.fixture` decorator.
 
@@ -33,9 +33,9 @@ def generate_version_fixture_params():
     :returns:
         A dictionary with keys ``params`` and ``ids``.
     """
-    body = urlopen('https://chromedriver.storage.googleapis.com').read()
+    body = urlopen('https://api.github.com/repos/mozilla/geckodriver/releases').read()
     versions = re.findall(
-        r'<Key>(\d+\.\d{2}).*?<ETag>"(.*?)"</ETag>',
+        r'\"tag_name\":\s?\"v(\d+\.\d+\.\d+)\"',
         body.decode('utf-8'),
     )
 
@@ -60,25 +60,25 @@ class Base(object):
     def _uninstall(self):
         try:
             subprocess.check_call(
-                shlex.split('pip uninstall chromedriver_installer -y')
+                shlex.split('pip uninstall geckodriver_installer -y')
             )
         except subprocess.CalledProcessError:
             pass
 
-        chromedriver_executable = os.path.join(VIRTUALENV_DIR,
-                                               'bin', 'chromedriver')
+        geckodriver_executable = os.path.join(VIRTUALENV_DIR,
+                                               'bin', 'geckodriver')
 
-        if os.path.exists(chromedriver_executable):
-            print('REMOVING chromedriver executable: ' +
-                  chromedriver_executable)
-            os.remove(chromedriver_executable)
+        if os.path.exists(geckodriver_executable):
+            print('REMOVING geckodriver executable: ' +
+                  geckodriver_executable)
+            os.remove(geckodriver_executable)
 
     def teardown(self):
         self._uninstall()
 
     def _not_available(self):
         with pytest.raises(OSError):
-            subprocess.check_call(shlex.split('chromedriver --version'))
+            subprocess.check_call(shlex.split('geckodriver --version'))
 
 
 class TestFailure(Base):
@@ -86,8 +86,8 @@ class TestFailure(Base):
         self._not_available()
 
         command = INSTALL_COMMAND_BASE + (
-            '--install-option="--chromedriver-version=2.10" '
-            '--install-option="--chromedriver-checksums=foo,bar,baz"'
+            '--install-option="--geckodriver-version=2.10" '
+            '--install-option="--geckodriver-checksums=foo,bar,baz"'
         )
 
         error_message = subprocess.Popen(
@@ -103,7 +103,7 @@ class TestFailure(Base):
 class VersionBase(Base):
     def _assert_cached_files_exist(self, exists, remove=False):
         path = os.path.join(tempfile.gettempdir(),
-                            'chromedriver_{0}.zip'.format(self.version))
+                            'geckodriver_{0}.zip'.format(self.version))
 
         if remove and os.path.exists(path):
             os.remove(path)
@@ -113,7 +113,7 @@ class VersionBase(Base):
     def _test_version(self, version, cached):
         self.version, self.checksums = version
 
-        # Chromedriver executable should not be available.
+        # geckodriver executable should not be available.
         self._not_available()
 
         # Assert that zip archives are cached or not, depending on test type.
@@ -122,9 +122,9 @@ class VersionBase(Base):
         # After installation...
         subprocess.check_call(shlex.split(self._get_install_command()))
 
-        # ...the chromedriver executable should be available...
+        # ...the geckodriver executable should be available...
         expected_version, error = subprocess.Popen(
-            shlex.split('chromedriver -v'),
+            shlex.split('geckodriver -v'),
             stdout=subprocess.PIPE
         ).communicate()
 
@@ -139,16 +139,5 @@ class TestVersionOnly(VersionBase):
     def _get_install_command(self):
         return (
             INSTALL_COMMAND_BASE +
-            '--install-option="--chromedriver-version={0}"'.format(self.version)
+            '--install-option="--geckodriver-version={0}"'.format(self.version)
         )
-
-
-class TestVersionAndChecksums(VersionBase):
-    def _get_install_command(self):
-        return INSTALL_COMMAND_BASE + (
-            '--install-option="--chromedriver-version={0}" '
-            '--install-option="--chromedriver-checksums={1}"'
-        ).format(self.version, ','.join(self.checksums))
-
-    def test_version_cached(self, version):
-        self._test_version(version, cached=True)
