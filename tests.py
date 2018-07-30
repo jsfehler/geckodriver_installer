@@ -128,7 +128,7 @@ class VersionBase(Base):
         self._assert_cached_files_exist(cached, remove=not cached)
 
         # After installation...
-        subprocess.check_call(shlex.split(self._get_install_command()))
+        subprocess.check_call(self._get_popen_args(self._get_install_command()))
 
         # ...the chromedriver executable should be available...
         expected_version, error = subprocess.Popen(
