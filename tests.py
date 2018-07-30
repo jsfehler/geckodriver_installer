@@ -4,6 +4,7 @@ import re
 import shlex
 import subprocess
 import tempfile
+
 try:
     # For Python 3.0 and later
     from urllib.request import urlopen
@@ -12,7 +13,6 @@ except ImportError:
     from urllib2 import urlopen
 
 import pytest
-
 
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 VIRTUALENV_DIR = os.environ['VIRTUAL_ENV']
@@ -60,7 +60,7 @@ class Base(object):
     def _uninstall(self):
         try:
             subprocess.check_call(
-                shlex.split('pip uninstall chromedriver_installer -y')
+                self._get_popen_args('pip uninstall chromedriver_installer -y')
             )
         except subprocess.CalledProcessError:
             pass
@@ -78,7 +78,13 @@ class Base(object):
 
     def _not_available(self):
         with pytest.raises(OSError):
-            subprocess.check_call(shlex.split('chromedriver --version'))
+            subprocess.check_call(self._get_popen_args('chromedriver --version'))
+
+    def _get_popen_args(self, command):
+        if os.name == 'posix':
+            return shlex.split(command, posix=os.name == 'posix')
+        else:
+            return command
 
 
 class TestFailure(Base):
@@ -90,8 +96,10 @@ class TestFailure(Base):
             '--install-option="--chromedriver-checksums=foo,bar,baz"'
         )
 
+        commandForPopen = self._get_popen_args(command)
+
         error_message = subprocess.Popen(
-            shlex.split(command),
+            commandForPopen,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         ).communicate()[0]
@@ -124,7 +132,7 @@ class VersionBase(Base):
 
         # ...the chromedriver executable should be available...
         expected_version, error = subprocess.Popen(
-            shlex.split('chromedriver -v'),
+            self._get_popen_args('chromedriver -v'),
             stdout=subprocess.PIPE
         ).communicate()
 
@@ -138,8 +146,8 @@ class VersionBase(Base):
 class TestVersionOnly(VersionBase):
     def _get_install_command(self):
         return (
-            INSTALL_COMMAND_BASE +
-            '--install-option="--chromedriver-version={0}"'.format(self.version)
+                INSTALL_COMMAND_BASE +
+                '--install-option="--chromedriver-version={0}"'.format(self.version)
         )
 
 
