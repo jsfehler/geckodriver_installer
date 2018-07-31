@@ -4,6 +4,7 @@ import re
 import shlex
 import subprocess
 import tempfile
+from packaging import version
 
 try:
     # For Python 3.0 and later
@@ -17,6 +18,7 @@ import pytest
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 VIRTUALENV_DIR = os.environ['VIRTUAL_ENV']
 INSTALL_COMMAND_BASE = 'pip install {0} '.format(PROJECT_DIR)
+OLDEST_SUPPORTED_VERSION = '0.11.0'
 
 
 def generate_version_fixture_params():
@@ -39,9 +41,11 @@ def generate_version_fixture_params():
         body.decode('utf-8'),
     )
 
+    versions = [pair for pair in versions if version.parse(pair[0]) >= version.parse(OLDEST_SUPPORTED_VERSION)]
+
     params = [
-        (version, [checksum for _, checksum in checksums])
-        for version, checksums in itertools.groupby(versions, lambda x: x[0])
+        (ver, [checksum for _, checksum in checksums])
+        for ver, checksums in itertools.groupby(versions, lambda x: x[0])
     ]
 
     return dict(
