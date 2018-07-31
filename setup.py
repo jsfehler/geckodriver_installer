@@ -175,7 +175,7 @@ class Install(install):
 
 setup(
     name='geckodriver_installer',
-    version='0.0.1',
+    version='0.0.7',
     author='Tyler Austen',
     author_email='tyler@springahead.com',
     description='Geckodriver Installer',
