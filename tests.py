@@ -4,7 +4,7 @@ import re
 import shlex
 import subprocess
 import tempfile
-from packaging import version
+from distutils.version import StrictVersion
 
 try:
     # For Python 3.0 and later
@@ -41,7 +41,7 @@ def generate_version_fixture_params():
         body.decode('utf-8'),
     )
 
-    versions = [pair for pair in versions if version.parse(pair[0]) >= version.parse(OLDEST_SUPPORTED_VERSION)]
+    versions = [pair for pair in versions if StrictVersion(pair[0]) >= StrictVersion(OLDEST_SUPPORTED_VERSION)]
 
     params = [
         (ver, [checksum for _, checksum in checksums])

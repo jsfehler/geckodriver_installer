@@ -1,7 +1,7 @@
 from distutils.command.install import install
 from distutils.command.build_scripts import build_scripts
 from distutils.core import setup
-from packaging import version
+from distutils.version import StrictVersion
 import os
 import platform
 import re
@@ -162,7 +162,7 @@ class Install(install):
                                 .format(self.geckodriver_version,
                                         GECKODRIVER_VERSION_PATTERN.pattern))
 
-            if not version.parse(self.geckodriver_version) >= version.parse(OLDEST_SUPPORTED_VERSION):
+            if not StrictVersion(self.geckodriver_version) >= StrictVersion(OLDEST_SUPPORTED_VERSION):
                 raise Exception('Invalid --geckodriver-version={0}! '
                                 'Minimum supported version is {1}'
                                 .format(self.geckodriver_version,
