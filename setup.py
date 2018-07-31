@@ -27,7 +27,7 @@ GECKODRIVER_URL_TEMPLATE = (
 GECKODRIVER_RELEASES_VERSION_PATTERN = re.compile(r'\"tag_name\":\s?\"v(\d+\.\d+\.\d+)\"')
 GECKODRIVER_VERSION_PATTERN = re.compile(r'(\d+\.\d+\.\d+)')
 
-OLDEST_SUPPORTED_VERSION = '0.11.0'
+OLDEST_SUPPORTED_VERSION = '0.11.1'
 
 # Global variables
 geckodriver_version = None

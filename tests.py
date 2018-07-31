@@ -18,7 +18,7 @@ import pytest
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 VIRTUALENV_DIR = os.environ['VIRTUAL_ENV']
 INSTALL_COMMAND_BASE = 'pip install {0} '.format(PROJECT_DIR)
-OLDEST_SUPPORTED_VERSION = '0.11.0'
+OLDEST_SUPPORTED_VERSION = '0.11.1'
 
 
 def generate_version_fixture_params():
