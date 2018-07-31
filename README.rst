@@ -1,7 +1,6 @@
 GeckoDriver Installer for Python
 =================================
-.. image:: https://travis-ci.org/peterhudec/chromedriver_installer.svg?branch=master
-    :target: https://travis-ci.org/peterhudec/chromedriver_installer
+Adapted from https://github.com/authomatic/chromedriver_installer
 
 Installs `GeckoDriver executable <https://github.com/mozilla/geckodriver/releases>`__
 with **pip** or **setup.py**.
@@ -72,7 +71,7 @@ The archive will be unzipped to the *build directory* and installed
 as an executable to the *bin directory*.
 
 If the ``--geckodriver-version`` option is ommited, it installs the most recent
-geckodriver version without checksum validation.
+geckodriver version.
 
 
 Testing
@@ -83,5 +82,4 @@ You need `tox <https://testrun.org/tox/latest/>`__ to run the tests.
 .. code-block:: bash
 
     (e)$ git clone https://github.com/tausten/geckodriver_installer.git
-    (e)$ pip install -r requirements.txt
     (e)$ tox
