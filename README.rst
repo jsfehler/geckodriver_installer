@@ -28,23 +28,20 @@ Install specific **GeckoDriver** version
 
 .. code-block:: bash
 
-    (e)$ python setup.py install --geckodriver-version=2.10
+    (e)$ python setup.py install --geckodriver-version=0.21.0
 
 After install, there should be the ``geckodriver`` executable
 available in your path:
 
 .. code-block:: bash
 
-    TODO: Fix this up for geckodriver
-
-    (e)$ which chromedriver
-    /home/andypipkin/e/bin/chromedriver
-    (e)$ chromedriver --version
-    ChromeDriver 2.10.267518
-    (e)$ chromedriver
-    Starting ChromeDriver (v2.10.267518) on port 9515
-    Only local connections are allowed.
-
+    (e)$ which geckodriver
+    /home/andypipkin/e/bin/geckodriver
+    (e)$ geckodriver --version
+    geckodriver 0.21.0
+    (e)$ geckodriver
+    1532996000606   geckodriver     INFO    geckodriver 0.21.0
+    1532996000617   geckodriver     INFO    Listening on 127.0.0.1:4444
 
 Installation With PIP
 ^^^^^^^^^^^^^^^^^^^^^
@@ -54,7 +51,7 @@ The same as before except you need to pass the install options wrapped in pip's
 
 .. code-block:: bash
 
-    (e)$ pip install geckodriver_installer --install-option="--geckodriver-version=2.10"
+    (e)$ pip install geckodriver_installer --install-option="--geckodriver-version=0.21.0"
 
 Installation With easy_install
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

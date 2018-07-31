@@ -35,7 +35,7 @@ def generate_version_fixture_params():
     """
     body = urlopen('https://api.github.com/repos/mozilla/geckodriver/releases').read()
     versions = re.findall(
-        r'\"tag_name\":\s?\"v(\d+\.\d+\.\d+)\"',
+        r'\"tag_name\":\s?\"v(\d+\.\d+\.\d+)\"()',
         body.decode('utf-8'),
     )
 
@@ -87,27 +87,6 @@ class Base(object):
             return command
 
 
-class TestFailure(Base):
-    def test_bad_checksum(self):
-        self._not_available()
-
-        command = INSTALL_COMMAND_BASE + (
-            '--install-option="--geckodriver-version=2.10" '
-            '--install-option="--geckodriver-checksums=foo,bar,baz"'
-        )
-
-        commandForPopen = self._get_popen_args(command)
-
-        error_message = subprocess.Popen(
-            commandForPopen,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        ).communicate()[0]
-
-        assert ('matches none of the checksums '
-                'foo, bar, baz!') in str(error_message)
-
-
 class VersionBase(Base):
     def _assert_cached_files_exist(self, exists, remove=False):
         path = os.path.join(tempfile.gettempdir(),
@@ -132,7 +111,7 @@ class VersionBase(Base):
 
         # ...the geckodriver executable should be available...
         expected_version, error = subprocess.Popen(
-            self._get_popen_args('geckodriver -v'),
+            self._get_popen_args('geckodriver --version'),
             stdout=subprocess.PIPE
         ).communicate()
 
@@ -149,3 +128,6 @@ class TestVersionOnly(VersionBase):
             INSTALL_COMMAND_BASE +
             '--install-option="--geckodriver-version={0}"'.format(self.version)
         )
+
+    def test_version_cached(self, version):
+        self._test_version(version, cached=True)
