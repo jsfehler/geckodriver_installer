@@ -8,3 +8,5 @@ chromedriver_installer.egg-info/
 MANIFEST
 .cache/
 venv/
+.pytest_cache/
+__pycache__/

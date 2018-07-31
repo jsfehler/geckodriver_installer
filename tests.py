@@ -4,6 +4,7 @@ import re
 import shlex
 import subprocess
 import tempfile
+
 try:
     # For Python 3.0 and later
     from urllib.request import urlopen
@@ -12,7 +13,6 @@ except ImportError:
     from urllib2 import urlopen
 
 import pytest
-
 
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 VIRTUALENV_DIR = os.environ['VIRTUAL_ENV']
@@ -60,7 +60,7 @@ class Base(object):
     def _uninstall(self):
         try:
             subprocess.check_call(
-                shlex.split('pip uninstall geckodriver_installer -y')
+                self._get_popen_args('pip uninstall geckodriver_installer -y')
             )
         except subprocess.CalledProcessError:
             pass
@@ -78,7 +78,13 @@ class Base(object):
 
     def _not_available(self):
         with pytest.raises(OSError):
-            subprocess.check_call(shlex.split('geckodriver --version'))
+            subprocess.check_call(self._get_popen_args('geckodriver --version'))
+
+    def _get_popen_args(self, command):
+        if os.name == 'posix':
+            return shlex.split(command, posix=os.name == 'posix')
+        else:
+            return command
 
 
 class TestFailure(Base):
@@ -90,8 +96,10 @@ class TestFailure(Base):
             '--install-option="--geckodriver-checksums=foo,bar,baz"'
         )
 
+        commandForPopen = self._get_popen_args(command)
+
         error_message = subprocess.Popen(
-            shlex.split(command),
+            commandForPopen,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         ).communicate()[0]
@@ -120,11 +128,11 @@ class VersionBase(Base):
         self._assert_cached_files_exist(cached, remove=not cached)
 
         # After installation...
-        subprocess.check_call(shlex.split(self._get_install_command()))
+        subprocess.check_call(self._get_popen_args(self._get_install_command()))
 
         # ...the geckodriver executable should be available...
         expected_version, error = subprocess.Popen(
-            shlex.split('geckodriver -v'),
+            self._get_popen_args('geckodriver -v'),
             stdout=subprocess.PIPE
         ).communicate()
 
