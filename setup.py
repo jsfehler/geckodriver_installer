@@ -175,7 +175,7 @@ class Install(install):
 
 setup(
     name='geckodriver_installer',
-    version='0.0.1',
+    version='0.0.2',
     author='Tyler Austen',
     author_email='tyler@springahead.com',
     description='Geckodriver Installer',
@@ -199,6 +199,6 @@ setup(
     package_data={'': ['*.txt', '*.rst']},
     # If packages is empty, contents of ./build/lib will not be copied!
     packages=['geckodriver_installer'],
-    scripts=['if', 'empty', 'BuildScripts', 'will', 'be', 'ignored'],
+    scripts=[],
     cmdclass=dict(build_scripts=BuildScripts, install=Install)
 )
