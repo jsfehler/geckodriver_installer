@@ -199,6 +199,6 @@ setup(
     package_data={'': ['*.txt', '*.rst']},
     # If packages is empty, contents of ./build/lib will not be copied!
     packages=['geckodriver_installer'],
-    scripts=[],
+    scripts=[''],
     cmdclass=dict(build_scripts=BuildScripts, install=Install)
 )
