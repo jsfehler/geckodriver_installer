@@ -16,6 +16,12 @@ except ImportError:
     import urllib as request
 
 
+def read(filename):
+    path = os.path.join(os.path.dirname(__file__), filename)
+    with open(path, 'r') as f:
+        return f.read()
+
+
 GECKODRIVER_INFO_URL = (
     'https://api.github.com/repos/mozilla/geckodriver/releases'
 )
@@ -179,8 +185,7 @@ setup(
     author='Tyler Austen',
     author_email='tyler@springahead.com',
     description='Geckodriver Installer',
-    long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst'))
-        .read(),
+    long_description=read('README.rst'),
     keywords='geckodriver installer',
     url='https://github.com/tausten/geckodriver_installer',
     classifiers=[
