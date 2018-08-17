@@ -1,6 +1,7 @@
-from distutils.command.install import install
+from setuptools.command.install import install
+from setuptools.command.develop import develop
 from distutils.command.build_scripts import build_scripts
-from distutils.core import setup
+from setuptools import setup
 from distutils.version import StrictVersion
 import os
 import platform
@@ -53,8 +54,25 @@ def get_geckodriver_version():
                         .format(GECKODRIVER_INFO_URL))
 
 
-class BuildScripts(build_scripts):
-    """Downloads and unzips the requested geckodriver executable."""
+class GeckoInstaller:
+    def __init__(self, build_dir):
+        self.build_dir = build_dir
+
+    def _unzip(self, zip_path):
+        if zip_path.endswith('zip'):
+            zf = zipfile.ZipFile(zip_path)
+        else:
+            zf = tarfile.open(zip_path)
+
+        print("\t - extracting '{0}' to '{1}'."
+              .format(zip_path, self.build_dir))
+        zf.extractall(self.build_dir)
+
+    def _get_compression_suffix(self):
+        result = 'tar.gz'
+        if platform.platform().lower().startswith('win'):
+            result = 'zip'
+        return result
 
     def _download(self, zip_path):
         compression = 'tar.gz'
@@ -98,40 +116,34 @@ class BuildScripts(build_scripts):
         if not download_ok:
             print('\t - download failed!')
 
-    def _unzip(self, zip_path):
-        if zip_path.endswith('zip'):
-            zf = zipfile.ZipFile(zip_path)
-        else:
-            zf = tarfile.open(zip_path)
 
-        print("\t - extracting '{0}' to '{1}'."
-              .format(zip_path, self.build_dir))
-        zf.extractall(self.build_dir)
-
-    def _get_compression_suffix(self):
-        result = 'tar.gz'
-        if platform.platform().lower().startswith('win'):
-            result = 'zip'
-        return result
-
+class BuildScripts(build_scripts):
+    """Downloads and unzips the requested geckodriver executable."""
     def run(self):
         global geckodriver_version, geckodriver_checksums
 
         if not geckodriver_version:
             geckodriver_version = get_geckodriver_version()
 
-        file_name = 'geckodriver_{version}.{compression}'.format(version=geckodriver_version, compression=self._get_compression_suffix())
+        gecko_installer = GeckoInstaller(self.build_dir)
+
+        file_name = 'geckodriver_{version}.{compression}'.format(version=geckodriver_version, compression=gecko_installer._get_compression_suffix())
         zip_path = os.path.join(tempfile.gettempdir(), file_name)
 
-        self._download(zip_path)
 
-        self._unzip(zip_path)
+        gecko_installer._download(zip_path)
+        gecko_installer._unzip(zip_path)
+
         self.scripts = [os.path.join(self.build_dir, script) for script in
                         os.listdir(self.build_dir)]
         build_scripts.run(self)
 
     def finalize_options(self):
         build_scripts.finalize_options(self)
+        self.initialize_options()
+        self.set_undefined_options('build_dir')
+        self.run()
+
         self.scripts = []
 
 
@@ -179,6 +191,50 @@ class Install(install):
         install.run(self)
 
 
+class PostDevelop(develop):
+    """Used to get geckodriver version and checksums from install options"""
+
+    # Fix an error when pip calls setup.py with the
+    # --single-version-externally-managed and it is not supported due to
+    # old setuptools version.
+    _svem = list(filter(lambda x: x[0] == 'single-version-externally-managed',
+                        develop.user_options))
+
+    if not _svem:
+        single_version_externally_managed = None
+        develop.user_options.append(('single-version-externally-managed',
+                                     None, ""))
+
+    user_options = develop.user_options + [
+        ('geckodriver-version=', None, 'Geckodriver version'),
+        ('geckodriver-checksums=', None, 'Geckodriver checksums'),
+    ]
+
+    def initialize_options(self):
+        self.geckodriver_version = None
+        develop.initialize_options(self)
+
+    def run(self):
+        global geckodriver_version
+
+        if self.geckodriver_version:
+            if not GECKODRIVER_VERSION_PATTERN.match(self.geckodriver_version):
+                raise Exception('Invalid --geckodriver-version={0}! '
+                                'Must match /{1}/'
+                                .format(self.geckodriver_version,
+                                        GECKODRIVER_VERSION_PATTERN.pattern))
+
+            if not StrictVersion(self.geckodriver_version) >= StrictVersion(OLDEST_SUPPORTED_VERSION):
+                raise Exception('Invalid --geckodriver-version={0}! '
+                                'Minimum supported version is {1}'
+                                .format(self.geckodriver_version,
+                                        OLDEST_SUPPORTED_VERSION))
+
+        geckodriver_version = self.geckodriver_version
+
+        develop.run(self)
+
+
 setup(
     name='geckodriver_installer',
     version='0.0.2',
@@ -205,5 +261,5 @@ setup(
     # If packages is empty, contents of ./build/lib will not be copied!
     packages=['geckodriver_installer'],
     scripts=['blank.py'],
-    cmdclass=dict(build_scripts=BuildScripts, install=Install)
+    cmdclass=dict(build_scripts=BuildScripts, install=Install, develop=PostDevelop)
 )
