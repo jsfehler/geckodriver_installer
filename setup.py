@@ -193,6 +193,7 @@ class Install(install):
         geckodriver_version = self.geckodriver_version
 
         install.run(self)
+        raise Exception(self.build_dir)
 
 
 class PostDevelop(develop):
