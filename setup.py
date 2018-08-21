@@ -245,9 +245,7 @@ class PostDevelop(develop):
 
     def finalize_options(self):
         self.set_undefined_options('build',
-                                   ('build_scripts', 'build_dir'),
-                                   ('force', 'force'),
-                                   ('executable', 'executable'))
+                                   ('build_scripts', 'build_dir'))
 
 
 setup(
