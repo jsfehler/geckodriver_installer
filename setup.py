@@ -193,7 +193,7 @@ class Install(install):
         geckodriver_version = self.geckodriver_version
 
         install.run(self)
-
+        raise Exception('e')
 
 
 
