@@ -137,9 +137,7 @@ class BuildScripts(build_scripts):
         self.scripts = [os.path.join(self.build_dir, script) for script in
                         os.listdir(self.build_dir)]
         build_scripts.run(self)
-
         self.copy_scripts()
-        raise Exception(self.scripts)
 
     def finalize_options(self):
         build_scripts.finalize_options(self)
@@ -147,7 +145,7 @@ class BuildScripts(build_scripts):
         self.set_undefined_options('build', ('build_scripts', 'build_dir'))
         self.run()
 
-        self.scripts = []
+        #self.scripts = []
 
 
 class Install(install):
