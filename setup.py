@@ -237,7 +237,7 @@ class PostDevelop(develop):
         geckodriver_version = self.geckodriver_version
 
         develop.run(self)
-        self.run_command('BuildScripts')
+        raise Exception(self.build_dir)
 
 
 setup(
