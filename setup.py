@@ -141,7 +141,7 @@ class BuildScripts(build_scripts):
     def finalize_options(self):
         build_scripts.finalize_options(self)
         self.initialize_options()
-        self.set_undefined_options('build_dir')
+        self.set_undefined_options('build', ('build_scripts', 'build_dir'))
         self.run()
 
         self.scripts = []
