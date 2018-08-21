@@ -154,6 +154,8 @@ class BuildScripts(build_scripts):
 class Install(install):
     """Used to get geckodriver version and checksums from install options"""
 
+    build_dir = None
+
     # Fix an error when pip calls setup.py with the
     # --single-version-externally-managed and it is not supported due to
     # old setuptools version.
@@ -197,6 +199,8 @@ class Install(install):
 
 class PostDevelop(develop):
     """Used to get geckodriver version and checksums from install options"""
+
+    build_dir = None
 
     # Fix an error when pip calls setup.py with the
     # --single-version-externally-managed and it is not supported due to
