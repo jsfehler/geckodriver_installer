@@ -238,7 +238,12 @@ class PostDevelop(develop):
         geckodriver_version = self.geckodriver_version
 
         develop.run(self)
-        raise Exception(self.build_dir)
+
+    def finalize_options(self):
+        self.set_undefined_options('build',
+                                   ('build_scripts', 'build_dir'),
+                                   ('force', 'force'),
+                                   ('executable', 'executable'))
 
 
 setup(
