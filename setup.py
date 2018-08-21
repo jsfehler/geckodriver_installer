@@ -138,7 +138,7 @@ class BuildScripts(build_scripts):
                         os.listdir(self.build_dir)]
         build_scripts.run(self)
 
-        raise Exception(os.getcwd())
+        raise Exception(os.path.)
 
     def finalize_options(self):
         build_scripts.finalize_options(self)
@@ -235,6 +235,7 @@ class PostDevelop(develop):
         geckodriver_version = self.geckodriver_version
 
         develop.run(self)
+        self.run_command('BuildScripts')
 
 
 setup(
@@ -263,5 +264,5 @@ setup(
     # If packages is empty, contents of ./build/lib will not be copied!
     packages=['geckodriver_installer'],
     scripts=['blank.py'],
-    cmdclass=dict(build_scripts=BuildScripts, install=Install, develop=PostDevelop)
+    cmdclass=dict(install=Install, develop=PostDevelop)
 )
