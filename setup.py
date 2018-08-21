@@ -138,19 +138,10 @@ class BuildScripts(build_scripts):
                         os.listdir(self.build_dir)]
         build_scripts.run(self)
 
-        tt = []
-        from distutils.util import convert_path
-        for script in self.scripts:
-            script = convert_path(script)
-            outfile = os.path.join(self.build_dir, os.path.basename(script))
-            tt.append(outfile)
-        raise Exception(tt)    
-        self.copy_scripts()
-
     def finalize_options(self):
         build_scripts.finalize_options(self)
         self.initialize_options()
-        self.set_undefined_options('build', ('build_scripts', 'build_dir'))
+        self.set_undefined_options('install', ('build_scripts', 'build_dir'))
         self.run()
 
         #self.scripts = []
