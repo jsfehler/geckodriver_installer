@@ -223,5 +223,5 @@ setup(
     # If packages is empty, contents of ./build/lib will not be copied!
     packages=['geckodriver_installer'],
     scripts=['blank.py'],
-    cmdclass=dict(build_scripts=BuildScripts, install=Install, develop=Install)
+    cmdclass=dict(build_scripts=BuildScripts, install=Install)
 )
