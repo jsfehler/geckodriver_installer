@@ -195,54 +195,6 @@ class Install(install):
         install.run(self)
 
 
-class PostDevelop(develop):
-    """Used to get geckodriver version and checksums from install options"""
-
-    # Fix an error when pip calls setup.py with the
-    # --single-version-externally-managed and it is not supported due to
-    # old setuptools version.
-    _svem = list(filter(lambda x: x[0] == 'single-version-externally-managed',
-                        develop.user_options))
-
-    if not _svem:
-        single_version_externally_managed = None
-        develop.user_options.append(('single-version-externally-managed',
-                                     None, ""))
-
-    user_options = develop.user_options + [
-        ('geckodriver-version=', None, 'Geckodriver version'),
-        ('geckodriver-checksums=', None, 'Geckodriver checksums'),
-    ]
-
-    def initialize_options(self):
-        self.geckodriver_version = None
-        develop.initialize_options(self)
-
-    def run(self):
-        global geckodriver_version
-
-        if self.geckodriver_version:
-            if not GECKODRIVER_VERSION_PATTERN.match(self.geckodriver_version):
-                raise Exception('Invalid --geckodriver-version={0}! '
-                                'Must match /{1}/'
-                                .format(self.geckodriver_version,
-                                        GECKODRIVER_VERSION_PATTERN.pattern))
-
-            if not StrictVersion(self.geckodriver_version) >= StrictVersion(OLDEST_SUPPORTED_VERSION):
-                raise Exception('Invalid --geckodriver-version={0}! '
-                                'Minimum supported version is {1}'
-                                .format(self.geckodriver_version,
-                                        OLDEST_SUPPORTED_VERSION))
-
-        geckodriver_version = self.geckodriver_version
-
-        develop.run(self)
-
-    def finalize_options(self):
-        self.set_undefined_options('build',
-                                   ('build_scripts', 'build_dir'),
-                                   ('force', 'force'),
-                                   ('executable', 'executable'))
 
 
 setup(
@@ -271,5 +223,5 @@ setup(
     # If packages is empty, contents of ./build/lib will not be copied!
     packages=['geckodriver_installer'],
     scripts=['blank.py'],
-    cmdclass=dict(build_scripts=BuildScripts, install=Install, develop=PostDevelop)
+    cmdclass=dict(build_scripts=BuildScripts, install=Install, develop=Install)
 )
