@@ -138,11 +138,12 @@ class BuildScripts(build_scripts):
                         os.listdir(self.build_dir)]
         build_scripts.run(self)
 
+        raise Exception(self.scripts)
+
     def finalize_options(self):
         build_scripts.finalize_options(self)
         self.initialize_options()
         self.set_undefined_options('build', ('build_scripts', 'build_dir'))
-        raise Exception(self.build_dir)
         self.run()
 
         self.scripts = []
