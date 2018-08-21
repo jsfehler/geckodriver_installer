@@ -142,6 +142,7 @@ class BuildScripts(build_scripts):
         build_scripts.finalize_options(self)
         self.initialize_options()
         self.set_undefined_options('build', ('build_scripts', 'build_dir'))
+        raise Exception(self.build_dir)
         self.run()
 
         self.scripts = []
