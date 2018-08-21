@@ -125,7 +125,7 @@ class BuildScripts(build_scripts):
         if not geckodriver_version:
             geckodriver_version = get_geckodriver_version()
 
-        gecko_installer = GeckoInstaller(install.build_dir)
+        gecko_installer = GeckoInstaller(self.build_dir)
 
         file_name = 'geckodriver_{version}.{compression}'.format(version=geckodriver_version, compression=gecko_installer._get_compression_suffix())
         zip_path = os.path.join(tempfile.gettempdir(), file_name)
@@ -134,11 +134,18 @@ class BuildScripts(build_scripts):
         gecko_installer._download(zip_path)
         gecko_installer._unzip(zip_path)
 
-        self.scripts = [os.path.join(install.build_dir, script) for script in
-                        os.listdir(install.build_dir)]
+        self.scripts = [os.path.join(self.build_dir, script) for script in
+                        os.listdir(self.build_dir)]
         build_scripts.run(self)
 
-
+        tt = []
+        from distutils.util import convert_path
+        for script in self.scripts:
+            script = convert_path(script)
+            outfile = os.path.join(self.build_dir, os.path.basename(script))
+            tt.append(outfile)
+        raise Exception(tt)    
+        self.copy_scripts()
 
     def finalize_options(self):
         build_scripts.finalize_options(self)
