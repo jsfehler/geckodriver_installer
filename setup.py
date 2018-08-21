@@ -138,6 +138,7 @@ class BuildScripts(build_scripts):
                         os.listdir(self.build_dir)]
         build_scripts.run(self)
 
+        self.copy_scripts()
         raise Exception(self.scripts)
 
     def finalize_options(self):
